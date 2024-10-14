@@ -1,4 +1,3 @@
-// src/features/chat/chatSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
@@ -10,25 +9,36 @@ export const chatSlice = createSlice({
   name: 'chat',
   initialState,
   reducers: {
-    sendMessage: (state, action) => {
-      state.messages.push({
-        id: Date.now(),
-        text: action.payload,
-        sender: state.currentUser,
-        timestamp: new Date().toISOString(),
-      });
+    sendMessage: {
+      reducer(state, action) {
+        state.messages.push(action.payload);
+      },
+      prepare(text, sender = { id: 1, name: 'User' }) {
+        return {
+          payload: {
+            id: Date.now(),
+            text,
+            sender,
+            timestamp: new Date().toISOString(),
+            reactions: {},
+          },
+        };
+      },
     },
-    receiveMessage: (state, action) => {
-      state.messages.push({
-        id: Date.now(),
-        text: action.payload,
-        sender: { id: 2, name: 'Bot' },
-        timestamp: new Date().toISOString(),
-      });
+    addReaction: (state, action) => {
+      const { messageId, reaction } = action.payload;
+      const message = state.messages.find(msg => msg.id === messageId);
+      if (message) {
+        if (!message.reactions[reaction]) {
+          message.reactions[reaction] = 1;
+        } else {
+          message.reactions[reaction]++;
+        }
+      }
     },
   },
 });
 
-export const { sendMessage, receiveMessage } = chatSlice.actions;
+export const { sendMessage, addReaction } = chatSlice.actions;
 
 export default chatSlice.reducer;
