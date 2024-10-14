@@ -21,7 +21,6 @@ const Chat = ({ darkMode }) => {
       setInput('');
       setIsTyping(true);
       
-      // Simulate receiving a message after a random delay
       setTimeout(() => {
         setIsTyping(false);
         dispatch(sendMessage('Thanks for your message!', { id: 2, name: 'Bot' }));
